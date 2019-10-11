@@ -12,7 +12,7 @@ public:
 	string getFitxer() const { return m_fitxer; }
 	string getData() const { return m_data; }
 
-	bool operator==(const Tramesa& t);
+	bool operator==(const Tramesa& t) { return m_data == t.getData(); }
 private:
 	string m_fitxer;
 	string m_data;
