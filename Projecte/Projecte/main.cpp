@@ -27,7 +27,7 @@ bool IgualFitxers(string nomF1, string nomF2, string nomFRes)
 				++cont;
 				fitxCompara << flush << "Error num " << cont << " a linia " << linia << endl << flush;
 				iguals = false;				
-			}
+			}	
 		}
 		if (!f1.eof() && f2.eof()) 
 		{
@@ -48,7 +48,6 @@ bool IgualFitxers(string nomF1, string nomF2, string nomFRes)
 
 int main()
 {
-
 	try
 	{
 		float grade = 0.0;
@@ -65,7 +64,8 @@ int main()
 
 		cout << "Comment :=>> ==========================================" << endl;
 		cout << "Comment :=>> ESCRIVINT XARXA1 ........................." << endl;
-		cout << m1;
+		if (MATRIX_DEBUG)
+			cout << m1;
 
 		cout << "Comment :=>> ==========================================" << endl;
 		cout << "Comment :=>> AFEGINT ELEMENTS          ................" << endl;
@@ -78,7 +78,8 @@ int main()
 		
 		cout << "Comment :=>> ==========================================" << endl;
 		cout << "Comment :=>> ESCRIVINT XARXA1 ........................." << endl;
-		cout << m1;
+		if (MATRIX_DEBUG)
+			cout << m1;
 		
 		cout << "Comment :=>> ==========================================" << endl;
 		cout << "Comment :=>> ESCRIVINT FITXER XARXA1 .................." << endl;
@@ -282,6 +283,7 @@ int main()
 		MatriuSparse m2(nomFitxerRels2);
 
 		cout << "Comment :=>> ESCRIVINT SubEpinions2Ordenat............ " << endl;
+		if (MATRIX_DEBUG)
 		cout << m2;
 
 		cout << "Comment :=>> AFEGINT 7 a posicio (0,2) ............... " << endl;
@@ -292,7 +294,8 @@ int main()
 		m2.setVal(5, 9, 9);
 
 		cout << "Comment :=>> ESCRIVINT SubEpinions2Ordenat............ " << endl;
-		cout << m2;
+		if (MATRIX_DEBUG)
+			cout << m2;
 
 
 		trobat = m2.getVal(0, 0, valor);
@@ -683,6 +686,7 @@ int main()
 		if (grade < 0)
 			grade = 0;
 		cout << endl << "Grade :=>> " << grade << endl;
+		system("pause");
 		return 0;
 	}
 	catch (std::bad_alloc)
@@ -696,5 +700,5 @@ int main()
 	{
 		cout << msg << endl;
 	}
-
+	system("pause");
 }

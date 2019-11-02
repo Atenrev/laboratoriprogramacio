@@ -1,0 +1,26 @@
+MATRIU DE FILES: 10 : COLUMNES: 10
+VALORS FILA:0(COL:VALOR)
+(1 : 2) (2 : 14) (3 : 2) 
+VALORS FILA:1(COL:VALOR)
+(0 : 2) (3 : 2) (5 : 2) 
+VALORS FILA:2(COL:VALOR)
+(0 : 2) (1 : 2) 
+VALORS FILA:3(COL:VALOR)
+(0 : 2) (2 : 2) 
+VALORS FILA:4(COL:VALOR)
+(1 : 2) (5 : 2) (6 : 2) (7 : 2) 
+VALORS FILA:5(COL:VALOR)
+(0 : 2) (1 : 2) (4 : 2) (9 : 18) 
+VALORS FILA:6(COL:VALOR)
+(0 : 2) (4 : 2) 
+VALORS FILA:7(COL:VALOR)
+(1 : 2) (4 : 2) 
+VALORS FILA:8(COL:VALOR)
+(1 : 16) 
+MATRIUS
+VALORS
+(2  14  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  18  2  2  2  2  16  )
+COLS
+(1  2  3  0  3  5  0  1  0  2  1  5  6  7  0  1  4  9  0  4  1  4  1  )
+INIFILA
+([ 0 : 0 ] [ 1 : 3 ] [ 2 : 6 ] [ 3 : 8 ] [ 4 : 10 ] [ 5 : 14 ] [ 6 : 18 ] [ 7 : 20 ] [ 8 : 22 ]  [Num Elems:23] )

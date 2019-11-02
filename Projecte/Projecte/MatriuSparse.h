@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 using namespace std;
-
+const int MATRIX_DEBUG = false;
 
 class MatriuSparse
 {
@@ -20,7 +20,9 @@ public:
 	int getNColumnes() const { return num_columns; }
 	bool getVal(int row, int col, float& val) const;
 	void setVal(int row, int col, const float val);
+	bool searchValue(int row, int col, int& index) const;
 	void resizeRowVector();
+	void squareIt();
 
 	MatriuSparse operator*(float v);
 	vector<float>& operator*(vector<float>& v);

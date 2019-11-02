@@ -22,15 +22,15 @@ MatriuSparse::MatriuSparse(const MatriuSparse & m)
 	{
 		for (int i = 0; i < m.values->size(); i++)
 		{
-			(*(this->columns)).push_back((*(m.columns))[i]);
-			(*(this->values)).push_back((*(m.values))[i]);
+			(*columns).push_back((*(m.columns))[i]);
+			(*values).push_back((*(m.values))[i]);
 		}
 	}
 	if (m.row_ptr != nullptr)
 	{
 		for (int i = 0; i < m.row_ptr->size(); i++)
 		{
-			(*(this->row_ptr)).push_back((*(m.row_ptr))[i]);
+			(*row_ptr).push_back((*(m.row_ptr))[i]);
 		}
 	}
 }
@@ -38,54 +38,56 @@ MatriuSparse::MatriuSparse(const MatriuSparse & m)
 MatriuSparse::MatriuSparse(const string & filename)
 {
 	init(0, 0);
-	(*this->row_ptr).push_back(0);
+	(*row_ptr).push_back(0);
 	string line;
 	ifstream fitxer;
 	fitxer.open(filename);
 
 	int row, col;
+	stringstream linestream;
+	string split_line;
 	if (fitxer.is_open())
 	{
 		while (getline(fitxer, line))
 		{
 			try
 			{
-				stringstream linestream(line);
-				string split_line;
+				linestream = stringstream(line);
 				getline(linestream, split_line, '\t');
 				row = stoi(split_line);
 				getline(linestream, split_line, '\t');
 				col = stoi(split_line);
-				cout << row << " " << col << "\n";
 				setVal(row, col, 1);
 			}
 			catch (exception e) 
 			{
-				cout << "An error has occurred while loading the matrix from file.";
+				cout << "An error has occurred while reading a line from file.";
 			}
 		}
 	}
-	try
-	{
-		fitxer.close();
-	}
-	catch (exception e)
-	{
-		cout << "File could not be closed.";
-	}
+	fitxer.close();
 }
 
 MatriuSparse::~MatriuSparse()
 {
-	// TODO
+	delete row_ptr;
+	delete columns;
+	delete values;
 }
-
-// INITIALIZATION
 
 void MatriuSparse::init(int num_rows, int num_columns)
 {
-	this->num_columns = num_columns;
-	this->num_rows = num_rows;
+	if (num_columns > num_rows)
+	{
+		this->num_columns = num_columns;
+		this->num_rows = num_columns;
+	}
+	else
+	{
+		this->num_columns = num_rows;
+		this->num_rows = num_rows;
+	}
+
 	this->columns = new vector<int>;
 	this->values = new vector<float>;
 	this->row_ptr = new vector<int>;
@@ -105,19 +107,11 @@ bool MatriuSparse::getVal(int row, int col, float & val) const
 	else
 	{
 		success = true;
-		val = 0;
-
-		int index = (*(this->row_ptr))[row];
-		for (; index < (*(this->row_ptr))[row + 1]; index++)
-		{
-			if ((*(this->columns))[index] == col)
-			{
-				val = (*(this->values))[index];
-				break;
-			}
-		}
+		int index;
+		bool found = searchValue(row, col, index);
+		val = found ? (*values)[index] : 0;
 	}
-
+		
 	return success;
 }
 
@@ -125,70 +119,164 @@ void MatriuSparse::setVal(int row, int col, const float val)
 {
 	if (val != 0)
 	{
-		if (col > this->num_columns || this->num_columns <= 0)
+		if (col >= this->num_columns || this->num_columns <= 0)
+		{
 			this->num_columns = col + 1;
-		if (row > this->num_rows || this->num_rows <= 0)
+		}
+		if (row >= this->num_rows || this->num_rows <= 0)
 		{
 			this->num_rows = row + 1;
+		}
+
+		squareIt();
+		if (this->num_rows >= (*row_ptr).size())
 			resizeRowVector();
-		}
 
-		int index = (*(this->row_ptr))[row],
-			row_end = (*(this->row_ptr))[row+1];
-		bool exists = false;
-
-		if (index != row_end)
-		{
-			while (index < row_end && col > (*(this->columns))[index])
-			{
-				exists = ((*(this->columns))[index] == col);
-				index++;
-			}
-		}
+ 		int index;
+		bool exists = searchValue(row, col, index);
 
 		if (!exists)
 		{
-			(*(this->columns)).insert((*(this->columns)).begin() + index, col);
-			(*(this->values)).insert((*(this->values)).begin() + index, val);
+			(*columns).emplace((*columns).begin() + index, col);
+			(*values).emplace((*values).begin() + index, val);
 
-			for (int i = row + 1; i <= this->num_rows; i++)
-			{
-				(*(this->row_ptr))[i]++;
-			}
+			auto it = begin(*row_ptr);
+			it += row + 1;
+			for (; it != end(*row_ptr); it++)
+				*it += 1;
 		}
 		else
 		{
-			(*(this->values))[index] = val;
+			(*values)[index] = val;
 		}
 	}
 }
 
+// MATRIX FUNCTIONS
+
+bool MatriuSparse::searchValue(int row, int col, int& index) const
+{
+	int left = (*(this->row_ptr))[row],
+		right = (*(this->row_ptr))[row + 1]-1;
+
+	if (left > right)
+	{
+		index = left;
+		return false;
+	}
+
+	while (left <= right)
+	{
+		index = (left+right) / 2;
+
+		if ((*columns)[index] == col)
+			return true;
+		else if ((*columns)[index] < col)
+			left = index + 1;
+		else
+			right = index - 1;
+	}
+
+	if ((*columns)[index] < col)
+		index++;
+	return false;
+}
+
 void MatriuSparse::resizeRowVector()
 {
-	while ((*(this->row_ptr)).size() <= this->num_rows)
-		(*(this->row_ptr)).push_back(
-			(*(this->row_ptr))[(*(this->row_ptr)).size() - 1]
-		);
+	vector<int> temp;
+	temp.reserve(num_rows+1);
+
+	for (int i = 0; i <= num_rows; i++)
+	{
+		if (i < (*row_ptr).size())
+			temp.emplace_back((*row_ptr)[i]);
+		else
+			temp.emplace_back((*row_ptr).back());
+	}
+
+	swap(temp, *row_ptr);
+}
+
+void MatriuSparse::squareIt()
+{
+	if (this->num_columns > this->num_rows)
+	{
+		this->num_rows = num_columns;
+	}
+	else
+	{
+		this->num_columns = num_rows;
+	}
 }
 
 // OPERATORS
 
 MatriuSparse MatriuSparse::operator*(float v)
 {
-	// TODO
-	return MatriuSparse();
+	MatriuSparse result(*this);
+
+	if (v != 0)
+	{
+		for (int i = 0; i < values->size(); i++)
+		{
+			(*result.values)[i] = (*values)[i] * v;
+		}
+	}
+	else
+	{
+		result.columns->resize(0);
+		result.values->resize(0);
+		result.row_ptr->assign(num_rows+1, 0);
+	}
+
+	return result;
 }
 
 vector<float>& MatriuSparse::operator*(vector<float>& v)
 {
-	// TODO
-	return (*(new vector<float>));
+	vector<float> * result = new vector<float>;
+	result->reserve((*row_ptr).size() - 1);
+	float sum, val;
+	int index, row_end;
+
+	for (int i = 0; i < (*row_ptr).size() - 1; i++)
+	{
+		sum = 0;
+		index = (*row_ptr)[i];
+		row_end = (*row_ptr)[i + 1];
+
+		if (index != row_end)
+		{
+			for (int j = index; j < row_end; j++)
+			{
+				sum += (*values)[j] * v[(*columns)[j]];
+			}
+		}
+		
+		result->push_back(sum);
+	}
+
+	return *result;
 }
 
 MatriuSparse MatriuSparse::operator/(float v)
 {
-	// TODO
-	return MatriuSparse();
+	MatriuSparse result(*this);
+
+	if (v != 0)
+	{
+		for (int i = 0; i < values->size(); i++)
+		{
+			(*result.values)[i] = (*values)[i] / v;
+		}
+	}
+	else
+	{
+		throw "Dividing by zero is not allowed...";
+	}
+
+	return result;
 }
 
 MatriuSparse & MatriuSparse::operator=(const MatriuSparse & m)
@@ -212,15 +300,15 @@ MatriuSparse & MatriuSparse::operator=(const MatriuSparse & m)
 		{
 			for (int i = 0; i < m.values->size(); i++)
 			{
-				(*(this->columns)).push_back((*(m.columns))[i]);
-				(*(this->values)).push_back((*(m.values))[i]);
+				(*columns).push_back((*(m.columns))[i]);
+				(*values).push_back((*(m.values))[i]);
 			}
 		}
 		if (m.row_ptr != nullptr)
 		{
 			for (int i = 0; i < m.row_ptr->size(); i++)
 			{
-				(*(this->row_ptr)).push_back((*(m.row_ptr))[i]);
+				(*row_ptr).push_back((*(m.row_ptr))[i]);
 			}
 		}
 	}
@@ -233,27 +321,31 @@ ostream & operator<<(ostream & out, const MatriuSparse & m)
 	int j;
 	for (int i = 0; i < m.row_ptr->size()-1; i++)
 	{
-		out << "\nVALORS FILA:" << i << "COL:VALOR\n";
-		for (j = (*(m.row_ptr))[i]; j < (*(m.row_ptr))[i + 1]; j++)
+		if ((*(m.row_ptr))[i] != (*(m.row_ptr))[i + 1]) 
 		{
-			out << "(" << (*(m.columns))[j] << " : " << (*(m.values))[j] << ") ";
+			out << "\nVALORS FILA:" << i << "(COL:VALOR)\n";
+			for (j = (*(m.row_ptr))[i]; j < (*(m.row_ptr))[i + 1]; j++)
+			{
+				out << "(" << (*(m.columns))[j] << " : " << (*(m.values))[j] << ") ";
+			}
 		}
 	}
 	out << "\nMATRIUS\nVALORS\n(";
 	for (int i = 0; i < m.values->size(); i++)
 	{
-		out << (*(m.values))[i] << " ";
+		out << (*(m.values))[i] << "  ";
 	}
 	out << ")\nCOLS\n(";
 	for (int i = 0; i < m.columns->size(); i++)
 	{
-		out << (*(m.columns))[i] << " ";
+		out << (*(m.columns))[i] << "  ";
 	}
-	out << ")\INIFILA\n(";
-	for (int i = 0; i < m.row_ptr->size()-1; i++)
+	out << ")\nINIFILA\n(";
+	for (int i = 0; i < m.row_ptr->size()-2; i++)
 	{
-		out << "[ " << i << " : " << (*(m.row_ptr))[i] << " ] ";
+		if ((*(m.row_ptr))[i] != (*(m.row_ptr))[i+1])
+			out << "[ " << i << " : " << (*(m.row_ptr))[i] << " ] ";
 	}
-	out << "[ Num Elems:" << (*(m.row_ptr))[m.row_ptr->size() - 1] << " ] )";
+	out << " [Num Elems:" << (*(m.row_ptr))[m.row_ptr->size() - 1] << "] )" << endl;
 	return out;
 }
