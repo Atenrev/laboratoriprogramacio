@@ -1,4 +1,0 @@
-Error num 1 a linia 16903
-Error num 2 a linia 120686
-Error num 3 a linia 120688
-Error num 4 a linia 120690

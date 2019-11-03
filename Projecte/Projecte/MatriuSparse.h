@@ -20,6 +20,7 @@ public:
 	int getNColumnes() const { return num_columns; }
 	bool getVal(int row, int col, float& val) const;
 	void setVal(int row, int col, const float val);
+	void pushVal(int row, int col, const float val);
 	bool searchValue(int row, int col, int& index) const;
 	void resizeRowVector();
 	void squareIt();
