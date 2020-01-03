@@ -236,6 +236,60 @@ void MatriuSparse::squareIt()
 	}
 }
 
+void MatriuSparse::clear()
+{
+	if (columns != nullptr)
+		delete columns;
+	this->columns = new vector<int>;
+	if (values != nullptr)
+		delete values;
+	this->values = new vector<float>;
+	if (row_ptr != nullptr)
+		delete row_ptr;
+	this->row_ptr = new vector<int>;
+
+	init(0, 0);
+	(*this->row_ptr).emplace_back(0);
+}
+
+void MatriuSparse::calcDegree(vector<int>& degrees) const
+{
+	int index, row_end, d_sum;
+
+	for (int i = 0; i < (*row_ptr).size() - 1; i++)
+	{
+		index = (*row_ptr)[i];
+		row_end = (*row_ptr)[i + 1];
+		d_sum = row_end - index;
+		degrees.emplace_back(d_sum);
+	}
+}
+
+void MatriuSparse::createMaps(vector<map<pair<int, int>, double>>& vMaps) const
+{
+	int index, row_end;
+	map<pair<int, int>, double> n_map;
+
+	for (int i = 0; i < (*row_ptr).size() - 1; i++)
+	{
+		index = (*row_ptr)[i];
+		row_end = (*row_ptr)[i + 1];
+
+		n_map = (*new map<pair<int, int>, double>);
+		for (int j = index; j < row_end; j++)
+			if (i != (*columns)[j])
+				n_map[pair<int, int>(i, (*columns)[j])] = 0.0;
+		vMaps.emplace_back(n_map);
+	}
+}
+
+void MatriuSparse::calcDendrograms(vector<Tree<double>*>& vDendrograms) const
+{
+	vDendrograms.reserve(num_rows);
+	for (int i = 0; i < num_rows; i++)
+		vDendrograms.emplace_back(new Tree<double>(i));
+}
+
 
 
 // OPERATORS

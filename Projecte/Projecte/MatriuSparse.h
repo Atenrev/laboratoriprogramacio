@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <map>
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "Tree.hpp"
 using namespace std;
 const int MATRIX_DEBUG = false;
 
@@ -24,6 +26,12 @@ public:
 	bool searchValue(int row, int col, int& index) const;
 	void resizeRowVector();
 	void squareIt();
+	void clear();
+
+	int getNValues() const { return (*values).size(); }
+	void calcDegree(vector<int>& degrees) const;
+	void createMaps(vector<map<pair<int, int>, double>>& vMaps) const;
+	void calcDendrograms(vector<Tree<double>*> & vDendrograms) const;
 
 	MatriuSparse operator*(float v);
 	vector<float>& operator*(vector<float>& v);

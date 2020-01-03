@@ -115,11 +115,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Comunitat.cpp" />
+    <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="Heap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MatriuSparse.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Comunitat.h" />
+    <ClInclude Include="ElemHeap.h" />
+    <ClInclude Include="Graph.h" />
+    <ClInclude Include="Heap.h" />
     <ClInclude Include="MatriuSparse.h" />
+    <ClInclude Include="Tree.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
