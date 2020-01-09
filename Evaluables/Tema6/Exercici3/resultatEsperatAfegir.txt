@@ -1,0 +1,11 @@
+Comment :=>> |-->BLACK,<NOM_D, (NOM_D, 40)>
+Comment :=>> |--|-->RED,<NOM_B, (NOM_B, 20)>
+Comment :=>> |--|--|-->BLACK,<NOM_A, (NOM_A, 10)>
+Comment :=>> |--|--|-->BLACK,<NOM_C, (NOM_C, 30)>
+Comment :=>> |--|-->RED,<NOM_G, (NOM_G, 70)>
+Comment :=>> |--|--|-->BLACK,<NOM_F, (NOM_F, 60)>
+Comment :=>> |--|--|--|-->RED,<NOM_E, (NOM_E, 50)>
+Comment :=>> |--|--|--|-->BUIT
+Comment :=>> |--|--|-->BLACK,<NOM_I, (NOM_I, 90)>
+Comment :=>> |--|--|--|-->RED,<NOM_H, (NOM_H, 80)>
+Comment :=>> |--|--|--|-->RED,<NOM_J, (NOM_J, 100)>

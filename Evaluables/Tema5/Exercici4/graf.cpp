@@ -185,6 +185,55 @@ void Graf::BFS(string nodeInicial, queue<string>& recorregut)
 
 void Graf::BFS(string nodeInicial, string nodeFinal, queue<string>& recorregut, stack<string>& cami)
 {
+	vector<string>::iterator itNode = find(m_nodes.begin(), m_nodes.end(), nodeInicial);
+	vector<string>::iterator itDesti = find(m_nodes.begin(), m_nodes.end(), nodeFinal);
+	vector<bool> visitat;
+	vector<int> origen;
+	visitat.resize(m_numNodes, false);
+	origen.resize(m_numNodes, -1);
+	queue<int> pendents;
+
+	if (itNode != m_nodes.end() && itDesti != m_nodes.end())
+	{
+		int pos = distance(m_nodes.begin(), itNode);
+		visitat[pos] = true;
+		pendents.push(pos);
+
+		while (!pendents.empty())
+		{
+			int nodeActual = pendents.front();
+			pendents.pop();
+			recorregut.push(m_nodes[nodeActual]);
+
+			if (m_nodes[nodeActual] == nodeFinal)
+				break;
+
+			// posem a la cua tots els nodes adjacents a nodeActual no visitats
+			for (int col = 0; col < m_numNodes; col++)
+			{
+				if ((m_matriuAdj[nodeActual][col] != 0) && (!visitat[col]))
+				{
+					pendents.push(col);
+					visitat[col] = true;
+					origen[col] = nodeActual;
+				}
+			}
+		}
+
+		int desti = distance(m_nodes.begin(), itDesti);
+		int i = origen[desti];
+
+		if (i != -1)
+		{
+			cami.push(m_nodes[desti]);
+			while (i != -1)
+			{
+				cami.push(m_nodes[i]);
+				i = origen[i];
+			}
+
+		}
+	}
 }
 
 void Graf::BFS(string nodeInicial, int distancia, queue<string>& recorregut)
@@ -194,4 +243,40 @@ void Graf::BFS(string nodeInicial, int distancia, queue<string>& recorregut)
 
 int Graf::BFS(string nodeInicial, string nodeFinal, queue<string>& recorregut)
 {
+	vector<string>::iterator itNode = find(m_nodes.begin(), m_nodes.end(), nodeInicial);
+	vector<bool> visitat;
+	vector<int> pasos;
+	visitat.resize(m_numNodes, false);
+	pasos.resize(m_numNodes, 0);
+	queue<int> pendents;
+
+	if (itNode != m_nodes.end())
+	{
+		int pos = distance(m_nodes.begin(), itNode);
+		visitat[pos] = true;
+		pasos[pos] = 0;
+		pendents.push(pos);
+
+		while (!pendents.empty())
+		{
+			int nodeActual = pendents.front();
+			pendents.pop();
+			recorregut.push(m_nodes[nodeActual]);
+
+			if (m_nodes[nodeActual] == nodeFinal)
+				return pasos[nodeActual];
+			// posem a la cua tots els nodes adjacents a nodeActual no visitats
+			for (int col = 0; col < m_numNodes; col++)
+			{
+				if ((m_matriuAdj[nodeActual][col] != 0) && (!visitat[col]))
+				{
+					pendents.push(col);
+					visitat[col] = true;
+					pasos[col] = pasos[nodeActual] + 1;
+				}
+			}
+		}
+	}
+
+	return -1;
 }
